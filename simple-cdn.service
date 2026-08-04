@@ -1,0 +1,15 @@
+[Unit]
+Description=simple-cdn FastAPI service
+After=network.target
+
+[Service]
+Type=simple
+User=web
+Group=web
+WorkingDirectory=/opt/simple-cdn
+ExecStart=/bin/bash /opt/simple-cdn/start.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

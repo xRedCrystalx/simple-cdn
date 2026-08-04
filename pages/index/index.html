@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>{% if found %}Index of /{{ path }}{% else %}Not found{% endif %}</title>
+    <style>{% include "style.css" %}</style>
+</head>
+
+<body>
+<div class="container medium top">
+    <header class="topbar">
+        <a class="brand" href="/">{{ brand|safe }}</a>
+
+        <nav class="nav">
+            <a href="/" class="active">Index</a>
+            <a href="/upload">Upload</a>
+            <a href="/admin">Admin</a>
+        </nav>
+    </header>
+
+    <div class="panel">
+        {% if found %}
+            <h1>Index</h1>
+
+            <div class="crumbs">
+                {% for crumb in crumbs %}
+                    {% if not loop.first %}<span class="sep">/</span>{% endif %}
+                    <a href="{{ crumb.href }}">{{ crumb.name }}</a>
+                {% endfor %}
+            </div>
+
+            <div class="list">
+                {% for item in items %}
+                    <a class="item {{ item.kind }}" href="{{ item.href }}">
+                        <span class="tag">{{ item.kind|upper }}</span>
+                        <span class="name">{{ item.name }}</span>
+                    </a>
+                {% else %}
+                    <div class="item empty">This folder is empty.</div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h1>Not found</h1>
+            <p class="description">Nothing is served at <span class="mono">/{{ path }}</span>.</p>
+
+            <div class="list">
+                <a class="item up" href="/">
+                    <span class="tag">UP</span>
+                    <span class="name">Back to root</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

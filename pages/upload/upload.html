@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Upload</title>
+    <style>{% include "style.css" %}</style>
+</head>
+
+<body>
+<div class="container medium top">
+    <header class="topbar">
+        <a class="brand" href="/">{{ brand|safe }}</a>
+
+        <nav class="nav">
+            <a href="/">Index</a>
+            <a href="/upload" class="active">Upload</a>
+            <a href="/admin">Admin</a>
+        </nav>
+    </header>
+
+    <div class="panel">
+        <h1>Upload a file</h1>
+        <p class="description">Your token is used for this request only, it is never stored.</p>
+
+        <form id="uploadForm" autocomplete="off">
+            <input type="hidden" id="type" value="upload">
+            <div class="field">
+                <label for="token">Upload token</label>
+                <input type="password" id="token" placeholder="Token" autocomplete="off" spellcheck="false" required>
+            </div>
+
+            <div class="field">
+                <label for="password">File password</label>
+                <input type="password" id="password" placeholder="Optional" autocomplete="new-password">
+            </div>
+
+            <div class="field">
+                <label for="file">File</label>
+
+                <label class="drop-area" id="dropArea">
+                    <span class="file-name" id="fileName">Choose a file or drop it here</span>
+                    <span class="file-meta" id="fileMeta">Up to {{ max_upload_size }}</span>
+                    <input type="file" id="file" required>
+                </label>
+            </div>
+
+            <div class="progress" id="progress" hidden>
+                <span class="bar" id="progressBar"></span>
+            </div>
+
+            <button type="submit" id="uploadButton">Upload</button>
+        </form>
+
+        <p class="message" id="status"></p>
+        <br>
+
+        <div class="output" id="result" hidden>
+            <span class="value mono" id="resultUrl"></span>
+            <button type="button" class="outline small" id="copyButton">Copy</button>
+        </div>
+    </div>
+</div>
+
+<script>{% include "app.js" %}</script>
+<script>{% include "upload/upload.js" %}</script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Admin panel</title>
+    <style>{% include "style.css" %}</style>
+</head>
+
+<body>
+<div class="container medium">
+    <header class="topbar">
+        <a class="brand" href="/">{{ brand|safe }}</a>
+
+        <nav class="nav">
+            <a href="/">Index</a>
+            <a href="/upload">Upload</a>
+            <a href="/admin" class="active">Admin</a>
+            <a href="/admin">Lock</a>
+        </nav>
+    </header>
+
+    <div class="panel">
+        <h2>Statistics</h2>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-value" id="statUploads">-</span>
+                <span class="stat-label">Uploads</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="statScreenshots">-</span>
+                <span class="stat-label">Screenshots</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="statTokens">-</span>
+                <span class="stat-label">Admin tokens</span>
+            </div>
+        </div>
+
+        <button type="button" class="outline" id="refreshStats">Refresh</button>
+        <p class="message" id="statsMessage"></p>
+    </div>
+
+    <div class="grid two">
+        <div class="panel">
+            <h2>Create token</h2>
+            <p class="description">Hands out a token for the given user.</p>
+
+            <form id="createForm" autocomplete="off">
+                <div class="field">
+                    <label for="createUserId">User ID</label>
+                    <input type="number" id="createUserId" min="1" step="1" value="1" required>
+                </div>
+
+                <div class="field">
+                    <label for="createType">Type</label>
+                    <select id="createType">
+                        <option value="upload">upload</option>
+                        <option value="img">img</option>
+                        <option value="admin">admin</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="createButton">Create</button>
+            </form>
+
+            <p class="message" id="createMessage"></p>
+
+            <div class="output" id="createResult" hidden>
+                <span class="value mono" id="createdToken"></span>
+                <button type="button" class="outline small" id="createCopy">Copy</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Delete token</h2>
+            <p class="description">Provide a token or a user ID, not both.</p>
+
+            <form id="deleteForm" autocomplete="off">
+                <div class="field">
+                    <label for="deleteToken">Token</label>
+                    <input type="text" id="deleteToken" placeholder="Token" spellcheck="false">
+                </div>
+
+                <div class="field">
+                    <label for="deleteUserId">User ID</label>
+                    <input type="number" id="deleteUserId" min="1" step="1" placeholder="User ID">
+                </div>
+
+                <button type="submit" class="outline" id="deleteButton">Delete</button>
+            </form>
+
+            <p class="message" id="deleteMessage"></p>
+        </div>
+    </div>
+
+    <div class="grid two">
+        <div class="panel">
+            <h2>Upload managed file</h2>
+            <p class="description">
+                Goes into the browsable index under its own name. Folders are created as
+                needed. These files cannot be password protected.
+            </p>
+
+            <form id="managedForm" autocomplete="off">
+                <div class="field">
+                    <label for="managedFolder">Folder</label>
+                    <input type="text" id="managedFolder" placeholder="e.g. docs/manuals" spellcheck="false">
+                </div>
+
+                <div class="field">
+                    <label for="managedFile">File</label>
+
+                    <label class="drop-area" id="managedDrop">
+                        <span class="file-name" id="managedName">Choose a file or drop it here</span>
+                        <span class="file-meta" id="managedMeta">Up to {{ max_upload_size }}</span>
+                        <input type="file" id="managedFile">
+                    </label>
+                </div>
+
+                <p class="hint mono" id="managedPreview"></p>
+
+                <div class="progress" id="managedProgress" hidden>
+                    <span class="bar" id="managedBar"></span>
+                </div>
+
+                <button type="submit" id="managedButton">Upload</button>
+            </form>
+
+            <p class="message" id="managedMessage"></p>
+
+            <div class="output" id="managedResult" hidden>
+                <span class="value mono" id="managedUrl"></span>
+                <button type="button" class="outline small" id="managedCopy">Copy</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Delete file</h2>
+            <p class="description">
+                Removes the file, along with its metadata or its entry in the index.
+                Use the endpoint as it appears in the URL, for example
+                <span class="mono">docs/manual.pdf</span> or <span class="mono">uploads/Ab12Cd34Ef</span>.
+            </p>
+
+            <form id="fileForm" autocomplete="off">
+                <div class="field">
+                    <label for="fileEndpoint">Endpoint</label>
+                    <input type="text" id="fileEndpoint" placeholder="docs/manual.pdf" spellcheck="false" required>
+                </div>
+
+                <button type="submit" class="outline" id="fileButton">Delete file</button>
+            </form>
+
+            <p class="message" id="fileMessage"></p>
+        </div>
+    </div>
+</div>
+
+<script>const ADMIN_TOKEN = {{ token|tojson }};</script>
+<script>{% include "app.js" %}</script>
+<script>{% include "admin/admin_panel.js" %}</script>
+</body>
+</html>

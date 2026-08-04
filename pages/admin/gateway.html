@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Admin</title>
+    <style>{% include "style.css" %}</style>
+</head>
+
+<body>
+<div class="container medium">
+    <header class="topbar">
+        <a class="brand" href="/">{{ brand|safe }}</a>
+    </header>
+
+    <div class="panel">
+        <h1>Admin token required</h1>
+
+        <p class="description">
+            This page is protected by an admin token. Please enter the token to access the admin panel.
+        </p>
+
+        <form method="POST" autocomplete="off">
+            <div class="field">
+                <label for="token">Admin token</label>
+                <input type="password" id="token" name="token" placeholder="Token" autocomplete="off" spellcheck="false" autofocus required>
+            </div>
+
+            <button type="submit">Unlock</button>
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
+
+    <p class="footer"><a href="/">Back to index</a></p>
+</div>
+</body>
+</html>
