@@ -29,6 +29,11 @@ app = FastAPI(
     }
 )
 
+if ENV.DEBUG:
+    print(f"------------")
+    print(f"!! Starting simple-cdn in DEBUG mode. !!")
+    print(f"------------")
+
 
 async def startup() -> Server:
     """Configure and serve web service."""
