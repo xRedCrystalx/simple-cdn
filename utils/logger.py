@@ -72,10 +72,12 @@ def resolve_level() -> int:
 
     An explicit LOG_LEVEL wins, otherwise DEBUG decides between debug and info.
     """
-    configured: str = ENV.LOG_LEVEL.strip().upper()
+    if ENV.DEBUG:
+        return logging.DEBUG
 
+    configured: str = ENV.LOG_LEVEL.strip().upper()
     if not configured:
-        return logging.DEBUG if ENV.DEBUG else logging.INFO
+        return logging.INFO
 
     level: int | str = logging._nameToLevel.get(configured)
 

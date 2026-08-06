@@ -13,6 +13,12 @@ from fastapi import Request
 
 logger = logging.getLogger("cdn.general")
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw: str | None = os.getenv(name)
+    if raw is None:
+        return default
+
+    return raw.strip().lower() in ("1", "true", "yes", "on")
 
 class ENV:
     """
@@ -24,7 +30,7 @@ class ENV:
     """
 
     BRAND_NAME: str = os.getenv("BRAND_NAME", "simple.cdn")
-    DEBUG: bool = bool(os.getenv("DEBUG", False))
+    DEBUG: bool = _env_bool(os.getenv("DEBUG"))
     PORT: int = int(os.getenv("PORT", 8000))
     HOST: str = os.getenv("HOST", "localhost")
     DOMAIN: str | None = os.getenv("DOMAIN", None)
