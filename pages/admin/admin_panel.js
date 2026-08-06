@@ -20,7 +20,7 @@ function renderStats(data) {
     $("statTokens").textContent = data.total_admin_tokens;
 
     // The api reports the disk in gigabytes, formatBytes() wants bytes.
-    $("statStorage").textContent = formatBytes(data.used_storage * GIGABYTE) + " / " + formatBytes(data.available_storage * GIGABYTE);
+    $("statStorage").textContent = formatBytes(data.used_storage * GIGABYTE) + " / " + formatBytes(data.total_storage * GIGABYTE);
     $("statFree").textContent = formatBytes((data.total_storage - data.used_storage) * GIGABYTE);
 }
 
