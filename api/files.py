@@ -91,7 +91,7 @@ async def store_endpoint_upload(req: Request, file: UploadFile, metadata: Upload
                     "INSERT INTO protected (hash) VALUES (?)", (hash_password(metadata.protected),)
                 )
 
-                protected_id: int = cur._cursor.lastrowid
+                protected_id: int = cur.get_cursor().lastrowid
                 logger.debug(f"Created protected record {protected_id} for endpoint '{endpoint}'.")
 
             except Exception as e:
