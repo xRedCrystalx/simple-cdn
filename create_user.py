@@ -15,6 +15,8 @@ async def main() -> None:
             await conn.rollback()
             print(f"Failed to create user '{account_name}': {e}")
 
+            return
+
         await conn.commit()
 
         row: asqlite.Cursor = await conn.execute("SELECT id FROM users WHERE username = ?", (account_name,))
