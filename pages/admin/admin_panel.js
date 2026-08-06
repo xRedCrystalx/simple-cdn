@@ -135,18 +135,45 @@ const createUser = $("createUser");
 const createMessage = $("createMessage");
 const createResult = $("createResult");
 
-/*
- * The picker shows usernames, the api only ever deals in account ids, so every option
- * carries its id as the value and the id is what leaves the page.
- */
-async function loadUsers() {
+// The delete panel picks an account as well, so one fetch fills both lists.
+const deleteUser = $("deleteUser");
+const userSelects = [createUser, deleteUser];
+
+function fillUserSelect(select, users, allowEmpty) {
     // A reload rebuilds the list from scratch, so hold on to whoever was picked.
-    const selected = createUser.value;
+    const selected = select.value;
 
-    createUser.textContent = "";
-    createUser.disabled = true;
+    select.textContent = "";
 
-    const placeholder = (label) => { createUser.appendChild(new Option(label, "")); };
+    if (allowEmpty) {
+        select.appendChild(new Option("None", ""));
+    }
+
+    for (const user of users) {
+        select.appendChild(new Option(user.username, String(user.id)));
+    }
+
+    // Falls back to the first entry when that user is gone, value goes empty on a miss.
+    select.value = selected;
+
+    if (!select.value) {
+        select.selectedIndex = 0;
+    }
+
+    select.disabled = false;
+}
+
+async function loadUsers() {
+    const placeholder = (label) => {
+        for (const select of userSelects) {
+            select.textContent = "";
+            select.appendChild(new Option(label, ""));
+        }
+    };
+
+    for (const select of userSelects) {
+        select.disabled = true;
+    }
 
     try {
         const data = await requestJSON("/api/admin/users", { headers: authHeaders(ADMIN_TOKEN) });
@@ -158,18 +185,8 @@ async function loadUsers() {
             return;
         }
 
-        for (const user of users) {
-            createUser.appendChild(new Option(user.username, String(user.id)));
-        }
-
-        // Falls back to the first account when that user is gone, value goes empty on a miss.
-        createUser.value = selected;
-
-        if (!createUser.value) {
-            createUser.selectedIndex = 0;
-        }
-
-        createUser.disabled = false;
+        fillUserSelect(createUser, users, false);
+        fillUserSelect(deleteUser, users, true);
     }
     catch (error) {
         placeholder("Could not load users");
@@ -223,20 +240,19 @@ $("deleteForm").addEventListener("submit", async (event) => {
     setMessage(deleteMessage, "");
 
     const target = $("deleteToken").value.trim();
-    const rawUserId = $("deleteUserId").value.trim();
-    const userId = rawUserId ? parseInt(rawUserId, 10) : null;
+    const userId = deleteUser.value ? parseInt(deleteUser.value, 10) : null;
 
     if (!target && userId === null) {
-        setMessage(deleteMessage, "Provide either a token or a user ID.", "error");
+        setMessage(deleteMessage, "Provide either a token or a user.", "error");
         return;
     }
 
     if (target && userId !== null) {
-        setMessage(deleteMessage, "Provide either a token or a user ID, not both.", "error");
+        setMessage(deleteMessage, "Provide either a token or a user, not both.", "error");
         return;
     }
 
-    if (!window.confirm(target ? "Delete this token?" : `Delete every token of user ${userId}?`)) {
+    if (!window.confirm(target ? "Delete this token?" : `Delete every token of ${deleteUser.selectedOptions[0].text}?`)) {
         return;
     }
 

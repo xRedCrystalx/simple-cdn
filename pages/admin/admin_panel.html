@@ -91,7 +91,7 @@
 
         <div class="panel">
             <h2>Delete token</h2>
-            <p class="description">Provide a token or a user ID, not both.</p>
+            <p class="description">Provide a token or a user, not both.</p>
 
             <form id="deleteForm" autocomplete="off">
                 <div class="field">
@@ -100,8 +100,11 @@
                 </div>
 
                 <div class="field">
-                    <label for="deleteUserId">User ID</label>
-                    <input type="number" id="deleteUserId" min="1" step="1" placeholder="User ID">
+                    <label for="deleteUser">User</label>
+
+                    <select id="deleteUser" disabled>
+                        <option value="">Loading users...</option>
+                    </select>
                 </div>
 
                 <button type="submit" class="outline" id="deleteButton">Delete</button>
