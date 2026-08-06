@@ -149,6 +149,6 @@ async def get_statistics(req: Request) -> StatisticsResponse:
         total_uploads=total_uploads,
         total_screenshots=total_screenshots,
         total_admin_tokens=total_admin_tokens,
-        available_storage=total_gb,
+        total_storage=total_gb,
         used_storage=used_gb
     )

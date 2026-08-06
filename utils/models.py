@@ -75,7 +75,7 @@ class StatisticsResponse(BaseModel):
     total_uploads: int
     total_screenshots: int
     total_admin_tokens: int
-    used_storage: float
+    total_storage: float
     available_storage: float
 
 

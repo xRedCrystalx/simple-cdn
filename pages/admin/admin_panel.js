@@ -21,7 +21,7 @@ function renderStats(data) {
 
     // The api reports the disk in gigabytes, formatBytes() wants bytes.
     $("statStorage").textContent = formatBytes(data.used_storage * GIGABYTE) + " / " + formatBytes(data.available_storage * GIGABYTE);
-    $("statFree").textContent = formatBytes((data.available_storage - data.used_storage) * GIGABYTE);
+    $("statFree").textContent = formatBytes((data.total_storage - data.used_storage) * GIGABYTE);
 }
 
 async function loadStats() {
