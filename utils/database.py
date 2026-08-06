@@ -29,7 +29,7 @@ class DatabaseManager:
     def __init__(self) -> None:
         # Declared but not assigned: the pool cannot be built without a running event
         # loop, so initialize_pools() finishes the job during startup.
-        self.MAIN_POOL: asqlite.Pool
+        self.MAIN_POOL: asqlite.Pool = None  # type: ignore[assignment]
 
     async def initialize_pools(self) -> None:
         """

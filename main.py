@@ -83,7 +83,9 @@ async def shutdown() -> None:
     """Release everything startup acquired."""
 
     from utils import database
-    await database.db_manager.MAIN_POOL.close()
+
+    if database.db_manager.MAIN_POOL is not None:
+        await database.db_manager.MAIN_POOL.close()
 
     logger.info("Shutdown complete.")
 
