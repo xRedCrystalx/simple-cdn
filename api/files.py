@@ -279,7 +279,7 @@ async def delete_endpoint_file(endpoint: str) -> StatusResponse:
     """
     Drop a database backed upload, its metadata and the password record it may hold.
     """
-    row: Row | None = await db_manager.execute("SELECT type, protected_id FROM endpoints WHERE endpoint = ? LIMIT 1 ", (endpoint,))
+    row: Row | None = await db_manager.execute("SELECT type, protected_id FROM endpoints WHERE endpoint = ? LIMIT 1 ", (endpoint,), fetch_one=True)
     if row is None:
         logger.info(f"Nothing to delete, no file is registered at endpoint '{endpoint}'.")
         return StatusResponse(status="error", message="File not found on the server.")

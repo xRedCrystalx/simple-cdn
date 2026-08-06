@@ -126,7 +126,7 @@ async def index_page(req: Request, path: str) -> Response:
 
     # anything left can only be a short database backed endpoint
     row: Row | None = await db_manager.execute(
-        "SELECT protected_id FROM endpoints WHERE endpoint = ? LIMIT 1", (path,)
+        "SELECT protected_id FROM endpoints WHERE endpoint = ? LIMIT 1", (path,), fetch_one=True
     )
 
     if row is None:
