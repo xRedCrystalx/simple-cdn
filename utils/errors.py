@@ -59,7 +59,7 @@ async def http_exception_handler(req: Request, exc: StarletteHTTPException) -> R
     detail: str = exc.detail if isinstance(exc.detail, str) else str(exc.detail)
 
     logger.info(f"Refused {req.method} '{req.url.path}' with {exc.status_code}: {detail}")
-    return error_response(detail, exc.status_code)
+    return error_response(exc.status_code, detail)
 
 async def unhandled_exception_handler(req: Request, exc: Exception) -> Response:
     """
