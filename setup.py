@@ -55,7 +55,7 @@ async def main() -> None:
         ))
 
 
-        ADMIN_SECRET: str = secrets.token_urlsafe(os.getenv("TOKEN_SIZE"))
+        ADMIN_SECRET: str = secrets.token_urlsafe(int(os.getenv("TOKEN_SIZE")))
 
         _ = await conn.execute(
             "INSERT INTO users (id, username) VALUES (?, ?)", (1, "admin")
