@@ -76,7 +76,7 @@ class StatisticsResponse(BaseModel):
     total_screenshots: int
     total_admin_tokens: int
     total_storage: float
-    available_storage: float
+    used_storage: float
 
 
 class UploadFileMetadata(BaseModel):
