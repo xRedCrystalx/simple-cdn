@@ -29,7 +29,7 @@ async def get_token_data(red_authorization: str | None = Header(None)) -> User |
 
     auth: Row | None = await db_manager.execute(
         "SELECT * FROM auth_tokens WHERE token = ? LIMIT 1",
-        (red_authorization.removeprefix(ENV.TOKEN_PREFIX), )
+        (red_authorization.removeprefix(ENV.TOKEN_PREFIX), ), fetch_one=True
     )
 
     if auth is None:
@@ -82,10 +82,7 @@ def hash_password(passwd: str) -> str:
     """
     Hash a file password with scrypt, using SCRYPT_SECRET as the salt.
 
-    A shared salt is what lets a password be checked by hashing the attempt and comparing
-    it to the stored digest, without keeping a per file salt around. It also means every
-    stored hash depends on SCRYPT_SECRET: changing that value in the environment makes
-    every existing protected file unopenable.
+    Changing that value in the environment makes every existing protected file unopenable.
     """
     hashed_bytes: bytes = hashlib.scrypt(
         passwd.encode("utf-8"),

@@ -58,7 +58,7 @@ async def admin_panel(req: Request, token: str = Form()) -> HTMLResponse:
     # Deliberately narrower than the auth dependencies: only an admin token opens this
     # page, and the type is part of the query rather than a check afterwards.
     row: Row | None = await db_manager.execute(
-        "SELECT 1 FROM auth_tokens WHERE token = ? AND type = 'admin' LIMIT 1", (token,)
+        "SELECT 1 FROM auth_tokens WHERE token = ? AND type = 'admin' LIMIT 1", (token,), fetch_one=True
     )
 
     if row is None:

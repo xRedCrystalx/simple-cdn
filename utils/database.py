@@ -40,38 +40,35 @@ class DatabaseManager:
         logger.info(f"Database pool ready ('main.db', size {ENV.DB_POOL_SIZE}).")
 
     @asynccontextmanager
-    async def acquire_cursor(self, pool: asqlite.Pool | None = None) -> AsyncGenerator[asqlite.Cursor, None]:
+    async def acquire_cursor(self) -> AsyncGenerator[asqlite.Cursor, None]:
         """
         Borrow a cursor for the duration of the `async with` block.
 
         Use this when a caller needs to commit or roll back several statements as one unit.
         """
-        pool = pool or self.MAIN_POOL
-
-        async with pool.acquire() as conn:
+        async with self.MAIN_POOL.acquire() as conn:
             async with conn.cursor() as cur:
                 yield cur
 
     @overload
-    async def execute(self, sql: str, params: tuple[Any, ...], pool: asqlite.Pool | None = None) -> Row | None: ...
+    async def execute(self, sql: str, params: tuple[Any, ...], fetch_one: bool = False) -> Row | None: ...
     @overload
-    async def execute(self, sql: str, params: tuple[Any, ...], pool: asqlite.Pool | None = None) -> list[Row]: ...
+    async def execute(self, sql: str, params: tuple[Any, ...], fetch_one: bool = False) -> list[Row]: ...
 
-    async def execute(self, sql: str, params: tuple[Any, ...], pool: asqlite.Pool | None = None) -> Row | None | list[Row]:
+    async def execute(self, sql: str, params: tuple[Any, ...], fetch_one: bool = False) -> Row | None | list[Row]:
         """
         Run one parameterised statement and return its rows.
 
         A query carrying `LIMIT 1` gets the single row (or None) it asked for, anything
         else gets the full list. Nothing is committed here, so this is for reads only.
         """
-        pool = pool or self.MAIN_POOL
 
         logger.debug(f"Executing query with {len(params)} parameter(s): {sql}")
 
-        async with self.acquire_cursor(pool) as cur:
+        async with self.acquire_cursor() as cur:
             _ret: asqlite.Cursor = await cur.execute(sql, params)
 
-            if "LIMIT 1" in sql:
+            if fetch_one:
                 row: Row | None = await _ret.fetchone()
 
                 logger.debug(f"Query matched {'one row' if row is not None else 'nothing'}.")

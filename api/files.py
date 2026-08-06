@@ -205,7 +205,7 @@ async def read_file(req: Request, metadata: ReadFileMetadata) -> Union[FileRespo
             "SELECT e.type, e.name, p.hash FROM endpoints e "
             "LEFT JOIN protected p ON e.protected_id = p.id "
             "WHERE e.endpoint = ? LIMIT 1 "),
-            (endpoint,)
+            (endpoint,), fetch_one=True
         )
 
         if row is None:
