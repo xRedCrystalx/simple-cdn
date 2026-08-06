@@ -85,10 +85,7 @@ def random_string(length: int = 8) -> str:
 
 def public_url(req: Request, endpoint: str) -> str:
     """Build a public URL for a given endpoint, using the request's base URL."""
-    url: str = f"{str(req.base_url)}{endpoint}"
-
-    logger.debug(f"Built public URL '{url}' for endpoint '{endpoint}'.")
-    return url
+    return f"https://{ENV.DOMAIN}/{endpoint}"
 
 def human_size(size: int) -> str:
     """
