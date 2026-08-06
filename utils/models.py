@@ -25,6 +25,22 @@ class User(BaseModel):
     id: int
     type: Literal["admin", "img", "upload"]
 
+class UserAccount(BaseModel):
+    """
+    A registered account. The admin panel lets an operator pick one by name, then sends
+    the `id` back when it asks for a token.
+    """
+
+    id: int
+    username: str
+
+class UserListResponse(BaseModel):
+    """
+    Every account the service knows about.
+    """
+
+    users: list[UserAccount]
+
 
 class AuthTokenRequest(BaseModel):
     """
@@ -59,9 +75,8 @@ class StatisticsResponse(BaseModel):
     total_uploads: int
     total_screenshots: int
     total_admin_tokens: int
-
-    used_storage: int | None = None
-    available_storage: int | None = None
+    used_storage: float
+    available_storage: float
 
 
 class UploadFileMetadata(BaseModel):

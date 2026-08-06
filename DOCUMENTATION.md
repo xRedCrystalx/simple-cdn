@@ -223,5 +223,3 @@ curl "https://your-domain.com/api/admin/stats" \
   "available_storage": null
 }
 ```
-
-`used_storage` and `available_storage` are part of the response schema but not currently populated.

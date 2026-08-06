@@ -5,13 +5,17 @@ The router carries `require_admin` as a router level dependency, so every route 
 admin only without repeating the check.
 """
 
-import logging, secrets
+import logging, secrets, shutil
 from fastapi import APIRouter, Request, Depends
 from typing import Union
+from sqlite3 import Row
 
 from utils.general import ENV
 from utils.database import db_manager
-from utils.models import StatusResponse, AuthTokenRequest, AuthTokenResponse, DeleteTokenRequest, StatisticsResponse
+from utils.models import (
+    StatusResponse, AuthTokenRequest, AuthTokenResponse, DeleteTokenRequest, StatisticsResponse,
+    UserAccount, UserListResponse
+)
 from utils.auth import require_admin
 
 logger = logging.getLogger("cdn.api.admin")
@@ -19,6 +23,21 @@ router = APIRouter(
     prefix="/api/admin", tags=["Admin endpoints"], dependencies=[Depends(require_admin)],
     responses={403: {"model": StatusResponse, "description": "The token is missing, unknown or not an admin token."}}
 )
+
+
+@router.get("/users")
+async def get_users(req: Request) -> UserListResponse:
+    """
+    List every account by id and username. This endpoint requires admin privileges.
+
+    Only the two columns the `users` table holds, there is nothing secret in either. The
+    admin panel reads this to offer usernames where the token endpoints want an id.
+    """
+    rows: list[Row] = await db_manager.execute("SELECT id, username FROM users ORDER BY username COLLATE NOCASE", ())
+
+    logger.debug(f"Listed {len(rows)} user account(s).")
+
+    return UserListResponse(users=[UserAccount(id=row["id"], username=row["username"]) for row in rows])
 
 
 @router.post("/token")
@@ -121,8 +140,15 @@ async def get_statistics(req: Request) -> StatisticsResponse:
 
     logger.debug(f"Statistics: {total_uploads} uploads, {total_screenshots} screenshots, {total_admin_tokens} admin tokens.")
 
+    # disk information
+    disk = shutil.disk_usage(ENV.PUBLIC_DIR)
+    total_gb: float = disk.total / (1024 ** 3)
+    used_gb: float = disk.used / (1024 ** 3)
+
     return StatisticsResponse(
         total_uploads=total_uploads,
         total_screenshots=total_screenshots,
-        total_admin_tokens=total_admin_tokens
+        total_admin_tokens=total_admin_tokens,
+        available_storage=total_gb,
+        used_storage=used_gb
     )

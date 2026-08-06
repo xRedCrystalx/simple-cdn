@@ -5,6 +5,8 @@
  * long as the document does and is never written to storage.
  */
 
+const GIGABYTE = 1024 ** 3;
+
 let createdTokenValue = "";
 let managedFileUrl = "";
 
@@ -16,6 +18,10 @@ function renderStats(data) {
     $("statUploads").textContent = data.total_uploads;
     $("statScreenshots").textContent = data.total_screenshots;
     $("statTokens").textContent = data.total_admin_tokens;
+
+    // The api reports the disk in gigabytes, formatBytes() wants bytes.
+    $("statStorage").textContent = formatBytes(data.used_storage * GIGABYTE) + " / " + formatBytes(data.available_storage * GIGABYTE);
+    $("statFree").textContent = formatBytes((data.available_storage - data.used_storage) * GIGABYTE);
 }
 
 async function loadStats() {
@@ -31,7 +37,8 @@ async function loadStats() {
     });
 }
 
-$("refreshStats").addEventListener("click", loadStats);
+// Accounts are created outside the panel, so a refresh picks those up as well as the counters.
+$("refreshStats").addEventListener("click", () => Promise.all([loadStats(), loadUsers()]));
 
 
 /* Managed upload */
@@ -124,8 +131,51 @@ $("managedCopy").addEventListener("click", () => copyText(managedFileUrl, $("man
 
 
 /* Create token */
+const createUser = $("createUser");
 const createMessage = $("createMessage");
 const createResult = $("createResult");
+
+/*
+ * The picker shows usernames, the api only ever deals in account ids, so every option
+ * carries its id as the value and the id is what leaves the page.
+ */
+async function loadUsers() {
+    // A reload rebuilds the list from scratch, so hold on to whoever was picked.
+    const selected = createUser.value;
+
+    createUser.textContent = "";
+    createUser.disabled = true;
+
+    const placeholder = (label) => { createUser.appendChild(new Option(label, "")); };
+
+    try {
+        const data = await requestJSON("/api/admin/users", { headers: authHeaders(ADMIN_TOKEN) });
+        const users = data.users || [];
+
+        if (!users.length) {
+            placeholder("No accounts");
+            setMessage(createMessage, "No accounts exist yet, create one with create_user.py.", "error");
+            return;
+        }
+
+        for (const user of users) {
+            createUser.appendChild(new Option(user.username, String(user.id)));
+        }
+
+        // Falls back to the first account when that user is gone, value goes empty on a miss.
+        createUser.value = selected;
+
+        if (!createUser.value) {
+            createUser.selectedIndex = 0;
+        }
+
+        createUser.disabled = false;
+    }
+    catch (error) {
+        placeholder("Could not load users");
+        setMessage(createMessage, error.message, "error");
+    }
+}
 
 $("createForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -133,10 +183,10 @@ $("createForm").addEventListener("submit", async (event) => {
     setMessage(createMessage, "");
     createResult.hidden = true;
 
-    const userId = parseInt($("createUserId").value, 10);
+    const userId = parseInt(createUser.value, 10);
 
     if (!Number.isInteger(userId) || userId < 1) {
-        setMessage(createMessage, "Enter a valid user ID.", "error");
+        setMessage(createMessage, "Select a user first.", "error");
         return;
     }
 
@@ -242,3 +292,4 @@ $("fileForm").addEventListener("submit", async (event) => {
 
 
 loadStats();
+loadUsers();
